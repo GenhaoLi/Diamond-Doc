@@ -12,7 +12,7 @@
 <script>
 import UserInfoIcon from "@/components/UserInfoIcon"
 import NotificationIcon from "@/components/NotificationIcon"
-import NavBarForEdit from '@/components/NavBarForEdit'
+import NavBarForEdit from "@/components/NavBarForEdit"
 export default {
   name: "EditView.vue",
   components: { NavBarForEdit, NotificationIcon, UserInfoIcon },
@@ -26,5 +26,4 @@ export default {
   align-items: center;
   box-shadow: rgba(0, 0, 0, 0.06) 0 1px 1px, rgba(0, 0, 0, 0.1) 0 2px 4px;
 }
-
 </style>
