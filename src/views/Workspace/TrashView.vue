@@ -4,10 +4,8 @@
 
 <script>
 export default {
-  name: 'TrashView'
+  name: "TrashView",
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
