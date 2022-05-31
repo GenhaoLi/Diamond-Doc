@@ -2,40 +2,49 @@
   <span class="nav-bar">
     <span><a class="clickable" @click="$router.push('/')">金刚石文档</a></span>
     <span class="search-bar">
-          <el-input v-model="searchInput" class="search-input" placeholder="搜索文件" size="small"
-                    @change="searchFile"
-                    @keyup.enter.native="searchFile">
-            <i slot="suffix" class="el-input__icon el-icon-search clickable" @click="searchFile"></i>
-          </el-input>
+      <el-input
+        v-model="searchInput"
+        class="search-input"
+        placeholder="搜索文件"
+        size="small"
+        @change="searchFile"
+        @keyup.enter.native="searchFile"
+      >
+        <i
+          slot="suffix"
+          class="el-input__icon el-icon-search clickable"
+          @click="searchFile"
+        ></i>
+      </el-input>
     </span>
     <span class="right-end">
-        <span><i class="el-icon-bell clickable"
-                 @click="showNotification"></i></span>
-        <span><i class="el-icon-user clickable"
-                 @click="showUserInfo"></i></span>
+      <span
+        >
+        <NotificationIcon></NotificationIcon>
+      </span>
+      <span>
+        <UserInfoIcon></UserInfoIcon>
+      </span>
     </span>
   </span>
 </template>
 
 <script>
+import UserInfoIcon from '@/components/UserInfoIcon'
+import NotificationIcon from '@/components/NotificationIcon'
 export default {
-  name: 'NavBar',
+  name: "NavBar",
+  components: { NotificationIcon, UserInfoIcon },
   data: function () {
     return {
-      searchInput: ''
+      searchInput: "",
     }
   },
   methods: {
-    searchFile () {
+    searchFile() {
       // TODO
     },
-    showNotification () {
-      // TODO
-    },
-    showUserInfo () {
-      // TODO
-    }
-  }
+  },
 }
 </script>
 
@@ -54,14 +63,10 @@ export default {
   width: 25%;
 }
 
-.clickable {
-  cursor: pointer;
-}
-
 .right-end {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 4%;
+  width: 5%;
 }
 </style>
