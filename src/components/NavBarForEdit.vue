@@ -1,9 +1,8 @@
 <template>
-  <span class="nav-bar">
-    <span>
+  <div class="nav-bar">
+    <div class="left-end">
       <el-button-group>
         <el-button
-          class="clickable"
           @click="$router.push('/workspace')"
           icon="el-icon-s-home"
           size="small"
@@ -20,16 +19,19 @@
           @click="$router.push('/edit/new')"
         ></el-button>
       </el-button-group>
-    </span>
-    <span class="right-end">
+    </div>
+    <div class="middle-span">
+      <span class="title">{{ title }}</span>
+    </div>
+    <div class="right-end">
       <span>
         <NotificationIcon></NotificationIcon>
       </span>
       <span>
         <UserInfoIcon></UserInfoIcon>
       </span>
-    </span>
-  </span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -38,11 +40,18 @@ import NotificationIcon from "@/components/NotificationIcon"
 export default {
   name: "NavBarForEdit",
   components: { UserInfoIcon, NotificationIcon },
+  props: ["title"],
   methods: {
-    showRecentDocs () {
+    showRecentDocs() {
       // TODO: show recent docs
-    }
-  }
+      this.$message.success("显示最近文档")
+    },
+  },
+  computed: {
+    currentDoc: function () {
+      return this.$store.state.currentDoc
+    },
+  },
 }
 </script>
 
@@ -55,11 +64,36 @@ export default {
   height: 50px;
 }
 
+.left-end {
+  float: left;
+  flex: 4;
+}
+
+.title {
+  font-size: 20px;
+  margin: auto;
+}
+
+.middle-span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 4;
+  width: 400px;
+  margin: auto;
+  height: 100%;
+}
+
 .right-end {
+  flex: 4;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 5%;
+  justify-content: right;
+  width: 50px;
+}
+
+.right-end span {
+  margin-left: 15px;
 }
 
 /deep/.el-button i {

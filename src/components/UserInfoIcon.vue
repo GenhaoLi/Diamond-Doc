@@ -2,16 +2,30 @@
   <div>
     <i class="el-icon-user clickable" @click="showUserInfo"></i>
     <el-dialog
-      title="提示"
+      title="个人信息"
       :visible.sync="userInfoVisible"
       width="30%"
       append-to-body
     >
-      <span>这是一段信息</span>
+      <el-form>
+        <el-form-item label="用户名">
+          <el-input v-model="userInfo.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="userInfo.password" type="password" show-password></el-input>
+        </el-form-item>
+<!--        TODO 修改密码时，两遍密码并检查-->
+        <el-form-item label="邮箱">
+          <el-input v-model="userInfo.email"></el-input>
+        </el-form-item>
+<!--        TODO 其他信息-->
+<!--        TODO 上传、修改头像-->
+      </el-form>
+      <div></div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="userInfoVisible = false">取 消</el-button>
-        <el-button type="primary" @click="userInfoVisible = false">
-          确 定
+        <el-button type="danger" @click="logout">退出登录</el-button>
+        <el-button type="primary" @click="updateInfo">
+          修改信息
         </el-button>
       </span>
     </el-dialog>
@@ -29,6 +43,57 @@ export default {
   methods: {
     showUserInfo() {
       this.userInfoVisible = true
+    },
+    updateInfo() {
+      // TODO 按照接口的参数来
+      this.$http.post("/user/updateInfo", this.userInfo).then(res => {
+        console.log(res)
+        if (res.data.code !== 200) {
+          this.$message({
+            message: res.data.message,
+            type: "error"
+          })
+          return
+        }
+        this.$store.commit("setUser", this.userInfo)
+        this.$message({
+          message: "修改成功",
+          type: "success"
+        })
+        this.userInfoVisible = false
+      }).catch(err => {
+        console.log(err)
+        this.$message({
+          message: "修改失败",
+          type: "error"
+        })
+      })
+    },
+    logout() {
+      this.$http({
+        url: "/user/logout",
+        method: "POST",
+      }).then((res) => {
+        console.log(res)
+        this.$store.commit("setUser", null)
+        sessionStorage.removeItem("uid")
+        this.$message({
+          message: "退出登录成功",
+          type: "success",
+        })
+        this.$router.push("/")
+      }).catch((err) => {
+        console.log(err)
+        this.$message({
+          message: "退出登录失败",
+          type: "error",
+        })
+      })
+    },
+  },
+  computed: {
+    userInfo() {
+      return this.$store.state.user
     },
   },
 }

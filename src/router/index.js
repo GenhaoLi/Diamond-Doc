@@ -9,13 +9,24 @@ const routes = [
     path: "/",
     name: "home",
     component: HomeView,
+    meta: {
+      requiresAuth: false,
+    },
   },
   {
     path: "/workspace",
     name: "workspace",
     component: () => import("../views/WorkspaceView.vue"),
     redirect: "/workspace/files",
+    meta: {
+      requiresAuth: true,
+    },
     children: [
+      {
+        path: "recent",
+        name: "recent",
+        component: () => import("../views/Workspace/RecentView.vue"),
+      },
       {
         path: "files",
         name: "files",
@@ -43,7 +54,16 @@ const routes = [
     path: "/edit/:fileId",
     name: "edit",
     component: () => import("../views/EditView.vue"),
+    meta: {
+      requiresAuth: true,
+    },
   },
+  {
+    path: '/invited/:code',
+    name: 'invited',
+    component: () => import('../views/InvitedView.vue')
+  }
+  // { path: '*', component: NotFoundComponent }
 ]
 
 const router = new VueRouter({

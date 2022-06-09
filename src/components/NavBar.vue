@@ -1,6 +1,8 @@
 <template>
   <span class="nav-bar">
-    <span><a class="clickable" @click="$router.push('/')">金刚石文档</a></span>
+    <span class="left-end"
+      ><a class="clickable" @click="$router.push('/')">金刚石文档</a></span
+    >
     <span class="search-bar">
       <el-input
         v-model="searchInput"
@@ -18,8 +20,7 @@
       </el-input>
     </span>
     <span class="right-end">
-      <span
-        >
+      <span>
         <NotificationIcon></NotificationIcon>
       </span>
       <span>
@@ -30,8 +31,8 @@
 </template>
 
 <script>
-import UserInfoIcon from '@/components/UserInfoIcon'
-import NotificationIcon from '@/components/NotificationIcon'
+import UserInfoIcon from "@/components/UserInfoIcon"
+import NotificationIcon from "@/components/NotificationIcon"
 export default {
   name: "NavBar",
   components: { NotificationIcon, UserInfoIcon },
@@ -43,6 +44,7 @@ export default {
   methods: {
     searchFile() {
       // TODO
+      this.$message.success("搜索文件")
     },
   },
 }
@@ -57,16 +59,29 @@ export default {
   height: 50px;
 }
 
+.left-end {
+  flex: 4;
+}
+
 .search-bar {
+  flex: 4;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   width: 25%;
+}
+.search-bar .search-input {
+  width: 60%;
 }
 
 .right-end {
+  flex: 4;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 5%;
+  justify-content: right;
+  width: 50px;
+}
+
+.right-end span {
+  margin-left: 15px;
 }
 </style>

@@ -5,15 +5,25 @@
         <NavBar></NavBar>
       </el-header>
       <el-container class="under-header">
-        <el-aside width="150px">
+        <el-aside width="250px">
           <!--          <el-radio-group v-model="isCollapse" style="margin-bottom: 20px;">-->
           <!--            <el-radio-button :label="false">展开</el-radio-button>-->
           <!--            <el-radio-button :label="true">收起</el-radio-button>-->
           <!--          </el-radio-group>-->
           <div class="btn-wrapper">
-            <el-button type="primary" plain @click="$router.push('/edit/new')">
-              新建文档
-            </el-button>
+            <el-popover placement="bottom" trigger="hover">
+              <el-button type="primary" plain slot="reference">
+                新建文档
+              </el-button>
+              <el-input
+                v-model="newDocTitle"
+                placeholder="文档名称"
+                style="margin-bottom: 10px;"
+              ></el-input>
+              <el-button @click="createDoc">
+                新建
+              </el-button>
+            </el-popover>
           </div>
           <el-menu
             :collapse="false"
@@ -23,6 +33,9 @@
             @close=""
             @open=""
           >
+            <el-menu-item index="recent"
+              ><i class="el-icon-time"></i>最近文件
+            </el-menu-item>
             <el-menu-item index="files"
               ><i class="el-icon-folder"></i><span slot="title">我的文件</span>
             </el-menu-item>
@@ -39,25 +52,63 @@
           </el-menu>
         </el-aside>
         <el-main>
-          <router-view></router-view>
+          <router-view v-if="showSubView"></router-view>
         </el-main>
       </el-container>
     </el-container>
+    <Auth></Auth>
   </div>
 </template>
 
 <script>
 import NavBar from "@/components/NavBar"
+import Auth from "@/components/Auth"
 
 export default {
   name: "WorkspaceView",
-  components: { NavBar },
+  components: { Auth, NavBar },
   data() {
     return {
-      isCollapse: false,
+      newDocTitle: "",
     }
   },
-  methods: {},
+  computed: {
+    userInfo() {
+      return this.$store.state.user
+    },
+    showSubView() {
+      return (
+        this.$store.state.user.user_id !== undefined &&
+        this.$store.state.user.user_id !== null
+      )
+    },
+  },
+  watch: {},
+  methods: {
+    createDoc() {
+      this.$http({
+        method: "post",
+        url: "/doc/new",
+        data: {
+          title: this.newDocTitle,
+          user_id: this.userInfo.user_id,
+        },
+      })
+        .then((response) => {
+          console.log(response)
+          if (!response.data.success) {
+            this.$message.error(response.data.message)
+            return
+          }
+          let newDoc = response.data.document
+          this.$router.push("/edit/" + newDoc.document_id)
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$message.error("新建文档失败")
+        })
+    },
+  },
 }
 </script>
 
@@ -87,7 +138,6 @@ export default {
 }
 
 .el-menu-item {
-  /*left align*/
   text-align: left;
 }
 
@@ -95,9 +145,5 @@ export default {
   display: flex;
   justify-content: center;
   padding: 20px;
-}
-
-.btn-wrapper .el-button {
-  width: 100%;
 }
 </style>

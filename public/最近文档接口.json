@@ -1,0 +1,43 @@
+{
+  "list": [
+    {
+      "document_id": "1",
+      "title": "title",
+      "author": {
+        "id": "1",
+        "name": "name"
+      },
+      "create_time": "TimeStamp",
+      "last_modify_time": "TimeStamp",
+      "type": 0, // 0: 没有开启协作的文档 1: 开启协作的文档 2: 团队文档
+      "team": null // type为0或1时，为null；type为2时，为团队信息
+    },
+    {
+      "document_id": "2",
+      "title": "title",
+      "author": {
+        "id": "1",
+        "name": "name"
+      },
+      "create_time": "TimeStamp",
+      "last_modify_time": "TimeStamp",
+      "type": 1,
+      "team": null
+    },
+    {
+      "document_id": "3",
+      "title": "title",
+      "author": {
+        "id": "1",
+        "name": "name"
+      },
+      "create_time": "TimeStamp",
+      "last_modify_time": "TimeStamp",
+      "type": 2,
+      "params": {
+        "team_id": "123123",
+        "team_name": "team_name"
+      }
+    }
+  ]
+}
