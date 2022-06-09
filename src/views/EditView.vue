@@ -3,7 +3,7 @@
     <el-header height="50px">
       <NavBarForEdit :title="doc.title"></NavBarForEdit>
     </el-header>
-    <el-main>
+    <el-main style="width: 60%; margin: auto">
       <div class="editor-wrapper">
         <editor
           api-key="33j1w9swchkuvtp0qm7e29q9dnjrx5onehxjfyrnfbo9vmkp"
@@ -12,11 +12,16 @@
           }"
           v-model="doc.document_content"
           initial-value="<p>Hello World!</p>"
+          :disabled="!isEditable"
         ></editor>
       </div>
       <div class="submit-button">
         <el-button type="primary" @click="saveFile" plain>保存</el-button>
       </div>
+      <div style="font-size: x-large; text-align: left; width: 100%">
+        评论
+      </div>
+      <el-divider></el-divider>
       <div class="comments">
         <el-card
           class="comment"
@@ -85,6 +90,7 @@ export default {
       },
       comments: [],
       commentContent: "",
+      isEditable: true,
     }
   },
   methods: {
@@ -101,8 +107,9 @@ export default {
             return
           }
           this.doc = response.data.document
+          this.isEditable = response.data.authority === 1
           if (!this.doc.document_content) {
-            this.doc.document_content = "<p>Hello World!</p>"
+            this.doc.document_content = "<p></p>"
           }
           this.$store.commit("setDocument", this.doc)
         })
@@ -184,21 +191,23 @@ export default {
 </script>
 
 <style scoped>
+/deep/ .el-divider {
+  margin: 18px 0;
+}
+
 .submit-button {
+  width: 100%;
   margin-top: 20px;
-  width: 60%;
   display: flex;
   justify-content: right;
 }
 
 .comments {
-  margin-top: 20px;
-  width: 60%;
+  width: 100%;
 }
 
 .make-comment {
-  margin-top: 20px;
-  width: 60%;
+  width: 100%;
 }
 
 /deep/ .el-card {
@@ -219,7 +228,7 @@ export default {
 }
 
 .editor-wrapper {
-  width: 60%;
+  width: 100%;
 }
 
 .el-main {
@@ -229,5 +238,6 @@ export default {
 }
 
 /deep/ .tox-tinymce {
+  min-height: 550px;
 }
 </style>

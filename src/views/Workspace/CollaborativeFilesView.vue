@@ -1,9 +1,8 @@
 <template>
-  <div class="files">
-    <!--    <img src="https://49.233.54.160:8081/image/1.png" alt="avatar" />-->
+  <div>
     <el-container>
       <el-header height="50px">
-        <div>我的文件</div>
+        <div>协作文档</div>
         <div class="right-end">
           <div class="header-buttons" v-if="selectedFiles.length !== 0">
             <el-button
@@ -11,8 +10,8 @@
               size="small"
               plain
               @click="deleteSelectedFiles"
-              >删除</el-button
-            >
+              >删除
+            </el-button>
             <el-divider direction="vertical"></el-divider>
           </div>
           <!--          select all-->
@@ -51,9 +50,6 @@
                 <el-button type="text" @click="renameFile(file.document_id)">
                   重命名
                 </el-button>
-                <el-button type="text" @click="moveFile(file.document_id)">
-                  移动
-                </el-button>
                 <el-button type="text" @click="deleteFile(file.document_id)">
                   删除
                 </el-button>
@@ -69,7 +65,12 @@
             </div>
             <div>
               <div class="file-name">{{ file.title }}</div>
-              <div class="file-info">修改于<br/>{{ file.last_modify_time }}</div>
+            </div>
+            <div>
+              <el-tag size="mini">可编辑</el-tag>
+            </div>
+            <div>
+              <div class="file-info">创建者：{{ file.username }}</div>
             </div>
           </div>
         </el-card>
@@ -81,43 +82,56 @@
 
 <script>
 import Invite from "@/components/Invite"
-
 export default {
-  name: "FilesView",
-  components: { Invite },
+  name: "CollaborativeFilesView",
+  components: {
+    Invite,
+  },
   data() {
     return {
       files: [],
       isAllSelected: false,
-      toBeShared: "",
+      toBeShared: null,
     }
   },
   computed: {
-    userInfo() {
-      return this.$store.state.user
-    },
     selectedFiles() {
       return this.files.filter((file) => file.is_checked)
     },
+    userInfo() {
+      return this.$store.state.user
+    },
+  },
+  mounted () {
+    this.getFiles()
   },
   methods: {
-    favFile(doc_id) {
+    getFiles() {
       this.$http
-        .post("/collection/new", {
-          user_id: this.userInfo.user_id,
-          document_id: doc_id,
+        .get("/doc/getCollaborativeDocument", {
+          params: {
+            user_id: this.userInfo.user_id,
+          },
         })
-        .then((response) => {
-          console.log(response)
-          if (!response.data.success) {
-            this.$message.error("收藏文档失败")
+        .then((res) => {
+          if (!res.data.success) {
+            this.$message.error(res.data.message)
             return
           }
-          this.$message.success("收藏文档成功")
-        }).catch((error) => {
-          console.log(error)
-          this.$message.error("收藏文档失败")
+          this.files = res.data.collaborativeDocumentList
         })
+        .catch((err) => {
+          console.log(err)
+          this.$message.error("获取文档失败")
+        })
+    },
+    goToEdit(doc_id) {
+      this.$router.push({
+        name: "Edit",
+        params: {
+          doc_id,
+        },
+      })
     },
     shareFile(document_id) {
       this.toBeShared = document_id
@@ -128,31 +142,11 @@ export default {
         this.$set(file, "is_checked", this.isAllSelected)
       })
     },
-    goToEdit(document_id) {
-      this.$router.push("/edit/" + document_id)
-    },
     addFileAttributes(files) {
       for (const file of files) {
         this.$set(file, "is_checked", false)
       }
       return files
-    },
-    getFiles() {
-      this.$http
-        .post("/doc/user/all?user_id=" + this.$store.state.user.user_id)
-        .then((response) => {
-          console.log(response)
-          if (!response.data.success) {
-            this.$message.error("获取文档列表失败")
-            return
-          }
-          this.files = response.data.list
-          this.files = this.addFileAttributes(this.files)
-        })
-        .catch((error) => {
-          console.log(error)
-          this.$message.error("获取文档列表失败")
-        })
     },
     deleteFile(document_id) {
       this.$http
@@ -174,23 +168,19 @@ export default {
         })
     },
     deleteSelectedFiles() {
-      let document_ids = this.selectedFiles.map((file) => file.document_id)
-      for (const document_id of document_ids) {
-        this.deleteFile(document_id)
+      const file_ids = this.selectedFiles.map((file) => file.document_id)
+      for (const file_id of file_ids) {
+        this.deleteFile(file_id)
       }
     },
-  },
-  mounted() {
-    this.getFiles()
   },
 }
 </script>
 
 <style scoped>
-.file-info{
+.file-info {
   font-size: 12px;
-  color: #999;
-  text-align: center;
+  color: #8c8c8c;
 }
 
 .right-end {

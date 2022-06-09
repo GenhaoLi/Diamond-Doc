@@ -11,25 +11,38 @@
           <!--            <el-radio-button :label="true">收起</el-radio-button>-->
           <!--          </el-radio-group>-->
           <div class="btn-wrapper">
-            <el-popover placement="bottom" trigger="hover">
+            <el-popover placement="bottom" trigger="click" append-to-body>
               <el-button type="primary" plain slot="reference">
                 新建文档
               </el-button>
-              <el-input
-                v-model="newDocTitle"
-                placeholder="文档名称"
-                style="margin-bottom: 10px;"
-              ></el-input>
-              <el-button @click="createDoc">
-                新建
-              </el-button>
+              <div class="new-doc-name">
+                <el-input
+                  v-model="newDocTitle"
+                  placeholder="文档名称"
+                  style="margin: 0 10px 10px 0; width: 140px"
+                ></el-input>
+                <div>
+                  <el-button @click="createDoc" type="primary"> 新建</el-button>
+                </div>
+              </div>
+              <div>
+                <el-select :value="template_id" placeholder="请选择模板">
+                  <el-option value="" label="不使用模板"></el-option>
+                  <el-option
+                    v-for="template in templates"
+                    :key="template.template_id"
+                    :label="template.template_name"
+                    :value="template.template_id"
+                  ></el-option>
+                </el-select>
+              </div>
             </el-popover>
           </div>
           <el-menu
             :collapse="false"
             class="el-menu-vertical-demo"
             :router="true"
-            default-active="files"
+            default-active="recent"
             @close=""
             @open=""
           >
@@ -38,6 +51,9 @@
             </el-menu-item>
             <el-menu-item index="files"
               ><i class="el-icon-folder"></i><span slot="title">我的文件</span>
+            </el-menu-item>
+            <el-menu-item index="collaborative_files"
+              ><i class="el-icon-suitcase"></i><span slot="title">协作文档</span>
             </el-menu-item>
             <el-menu-item index="teams"
               ><i class="el-icon-box"></i><span slot="title">团队空间</span>
@@ -70,6 +86,8 @@ export default {
   data() {
     return {
       newDocTitle: "",
+      template_id: "",
+      templates: [],
     }
   },
   computed: {
@@ -84,8 +102,30 @@ export default {
     },
   },
   watch: {},
+  mounted() {
+    this.getTemplates()
+  },
   methods: {
+    getTemplates() {
+      this.$http
+        .get("/template/all")
+        .then((res) => {
+          if (!res.data.success) {
+            this.$message.error(res.data.message)
+            return
+          }
+          this.templates = res.data.documentList
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$message.error("获取模板失败")
+        })
+    },
     createDoc() {
+      if (this.template_id !== "") {
+        this.createDocWithTemplate()
+        return
+      }
       this.$http({
         method: "post",
         url: "/doc/new",
@@ -108,12 +148,41 @@ export default {
           this.$message.error("新建文档失败")
         })
     },
+    createDocWithTemplate() {
+      this.$http({
+        method: "post",
+        url: "/doc/new/template",
+        data: {
+          title: this.newDocTitle,
+          user_id: this.userInfo.user_id,
+          template_id: this.template_id,
+        },
+      })
+        .then((response) => {
+          console.log(response)
+          if (!response.data.success) {
+            this.$message.error(response.data.message)
+            return
+          }
+          let newDoc = response.data.document
+          this.$router.push("/edit/" + newDoc.document_id)
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$message.error("新建文档失败")
+        })
+    },
   },
 }
 </script>
 
 <!--suppress CssUnusedSymbol -->
 <style scoped>
+.new-doc-name {
+  display: flex;
+  justify-content: space-between;
+}
+
 .el-header {
   z-index: 100;
   display: flex;

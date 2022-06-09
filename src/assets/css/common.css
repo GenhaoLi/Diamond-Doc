@@ -7,6 +7,6 @@
 }
 
 .el-popover {
-  min-width: 50px;
+  min-width: 30px;
   box-shadow: 2px 2px 10px 0 rgb(0 0 0 / 30%);
 }

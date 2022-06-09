@@ -17,7 +17,7 @@ const routes = [
     path: "/workspace",
     name: "workspace",
     component: () => import("../views/WorkspaceView.vue"),
-    redirect: "/workspace/files",
+    redirect: "/workspace/recent",
     meta: {
       requiresAuth: true,
     },
@@ -31,6 +31,11 @@ const routes = [
         path: "files",
         name: "files",
         component: () => import("../views/Workspace/FilesView.vue"),
+      },
+      {
+        path: "collaborative_files",
+        name: "collaborative_files",
+        component: () => import("../views/Workspace/CollaborativeFilesView.vue"),
       },
       {
         path: "teams",

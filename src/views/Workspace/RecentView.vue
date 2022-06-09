@@ -22,7 +22,7 @@
                   删除
                 </el-button>
                 <el-button type="text" @click="shareFile(file.document_id)">
-                  协作
+                  邀请协作
                 </el-button>
                 <el-button type="text" @click="renameFile(file.document_id)">
                   重命名
@@ -30,16 +30,38 @@
               </div>
             </el-popover>
           </div>
-          <div
-            class="center_wrapper clickable"
-            @click="goToEdit(file.document_id)"
-          >
-            <div>
-              <i class="el-icon-document"></i>
+          <div class="card-body">
+            <div
+              class="center_wrapper clickable"
+              @click="goToEdit(file.document_id)"
+            >
+              <div>
+                <i class="el-icon-document"></i>
+              </div>
+              <div>
+                <div class="file-name">{{ file.title }}</div>
+                <!--          TODO: when title too long -->
+              </div>
             </div>
-            <div>
-              <div class="file-name">{{ file.title }}</div>
-              <!--          TODO: when title too long -->
+            <div class="file-info">
+              <div v-if="file.type !== 0">
+                <el-tag size="mini">{{ getPermission(file.authority) }}</el-tag>
+              </div>
+              <div v-else>
+                <el-tag size="mini">可编辑</el-tag>
+              </div>
+              <div v-if="file.type === 2">
+                来自团队：{{ file.team.team_name }}
+              </div>
+              <div v-if="file.type === 1">协作文档</div>
+              <div v-if="file.type === 0">个人文档</div>
+              <div>
+                创建者：{{ file.author.creator_name === $store.state.user.user_name ? '我' : file.author.creator_name }}
+              </div>
+              <div>
+                最后修改于<br/>
+                {{ file.last_modify_time }}
+              </div>
             </div>
           </div>
         </el-card>
@@ -51,6 +73,7 @@
 
 <script>
 import Invite from "@/components/Invite"
+
 export default {
   name: "RecentView",
   components: { Invite },
@@ -61,6 +84,13 @@ export default {
     }
   },
   methods: {
+    getPermission(authority) {
+      return authority === 1 ? "可编辑" : "只读"
+    },
+    getType(type) {
+      const types = ["个人文档", "协作文档", "团队文档"]
+      return types[type]
+    },
     goToEdit(document_id) {
       this.$router.push("/edit/" + document_id)
     },
@@ -74,7 +104,7 @@ export default {
             return
           }
           this.files = response.data.list
-          this.$message.success("成功获取最近文档列表")
+          // this.$message.success("成功获取最近文档列表")
         })
         .catch((error) => {
           console.log(error)
@@ -89,6 +119,25 @@ export default {
 </script>
 
 <style scoped>
+.file-info {
+  margin-left: 20px;
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-size: x-small;
+  color: #8c8c8c;
+}
+
+.file-info div{
+  margin-bottom: 5px;
+}
+
+.card-body {
+  display: flex;
+  min-height: 100px;
+}
+
 /deep/ .el-header {
   display: flex;
   align-items: center;
@@ -125,16 +174,18 @@ export default {
 }
 
 /deep/ .el-card {
-  width: 200px;
+  width: 300px;
   height: 150px;
   margin: 10px;
 }
 
 .center_wrapper {
+  flex: 2;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  min-width: 70px;
 }
 
 /deep/ .el-card__body {
