@@ -8,16 +8,16 @@
           size="small"
         >
         </el-button>
-        <el-button
-          icon="el-icon-time"
-          size="small"
-          @click="showRecentDocs"
-        ></el-button>
-        <el-button
-          icon="el-icon-plus"
-          size="small"
-          @click="$router.push('/edit/new')"
-        ></el-button>
+<!--        <el-button-->
+<!--          icon="el-icon-time"-->
+<!--          size="small"-->
+<!--          @click="showRecentDocs"-->
+<!--        ></el-button>-->
+<!--        <el-button-->
+<!--          icon="el-icon-plus"-->
+<!--          size="small"-->
+<!--          @click="$router.push('/edit/new')"-->
+<!--        ></el-button>-->
       </el-button-group>
     </div>
     <div class="middle-span">

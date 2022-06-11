@@ -48,12 +48,13 @@
                 <el-button type="text" @click="shareFile(file.document_id)">
                   邀请协作
                 </el-button>
-                <el-button type="text" @click="renameFile(file.document_id)">
-                  重命名
-                </el-button>
-                <el-button type="text" @click="moveFile(file.document_id)">
-                  移动
-                </el-button>
+<!--                <el-button type="text" @click="renameFile(file.document_id)">-->
+<!--                  重命名-->
+<!--                </el-button>-->
+<!--                <el-button type="text" @click="moveFile(file.document_id)">-->
+<!--                  移动-->
+<!--                TODO move file to team-->
+<!--                </el-button>-->
                 <el-button type="text" @click="deleteFile(file.document_id)">
                   删除
                 </el-button>

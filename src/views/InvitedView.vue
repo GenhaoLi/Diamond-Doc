@@ -11,7 +11,7 @@
       <i class="el-icon-box inv-icon"></i>
       <div style="font-size: 30px">{{invitationInfo.team}}</div>
       <div>团队创建者：{{invitationInfo.leader}}</div>
-      <div>{{invitationInfo.inviter}}邀请你加入文档协作</div>
+      <div>{{invitationInfo.inviter}}邀请你加入团队协作</div>
       <el-button type="primary" @click="accept">加入并查看团队</el-button>
     </div>
     <Auth></Auth>
@@ -53,6 +53,7 @@ export default {
         })
     },
     accept() {
+      let isDocInv = this.invitationInfo.type === 0
       this.$http
         .post("/linked", {
           link: this.$route.params.code,
@@ -66,7 +67,7 @@ export default {
               type: "error",
             })
             if (res.data.message === "你已经加入该团队") {
-              this.$router.push("/edit/" + this.invitationInfo.document_id)
+              this.$router.push(isDocInv ? "/edit/" + this.invitationInfo.document_id : "/workspace/teams/")
             }
             return
           }
@@ -74,7 +75,7 @@ export default {
             message: "加入成功",
             type: "success",
           })
-          this.$router.push("/edit/" + this.invitationInfo.document_id)
+          this.$router.push(isDocInv ? "/edit/" + this.invitationInfo.document_id : "/workspace/teams/")
         })
         .catch((err) => {
           console.log(err)

@@ -3,7 +3,7 @@
     <el-header height="50px">
       <NavBarForEdit :title="doc.title"></NavBarForEdit>
     </el-header>
-    <el-main style="width: 60%; margin: auto">
+    <el-main style="width: 70%; margin: auto">
       <div class="editor-wrapper">
         <editor
           api-key="33j1w9swchkuvtp0qm7e29q9dnjrx5onehxjfyrnfbo9vmkp"

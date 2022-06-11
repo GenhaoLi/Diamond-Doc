@@ -26,12 +26,12 @@
                 </div>
               </div>
               <div>
-                <el-select :value="template_id" placeholder="请选择模板">
+                <el-select v-model="template_id" placeholder="请选择模板">
                   <el-option value="" label="不使用模板"></el-option>
                   <el-option
                     v-for="template in templates"
-                    :key="template.template_id"
-                    :label="template.template_name"
+                    :key="template.document_id"
+                    :label="template.title"
                     :value="template.template_id"
                   ></el-option>
                 </el-select>
@@ -52,11 +52,11 @@
             <el-menu-item index="files"
               ><i class="el-icon-folder"></i><span slot="title">我的文件</span>
             </el-menu-item>
-            <el-menu-item index="collaborative_files"
-              ><i class="el-icon-suitcase"></i><span slot="title">协作文档</span>
-            </el-menu-item>
             <el-menu-item index="teams"
               ><i class="el-icon-box"></i><span slot="title">团队空间</span>
+            </el-menu-item>
+            <el-menu-item index="collaborative_files"
+              ><i class="el-icon-suitcase"></i><span slot="title">协作文档</span>
             </el-menu-item>
             <el-menu-item index="favorites"
               ><i class="el-icon-star-off"></i
@@ -96,6 +96,7 @@ export default {
     },
     showSubView() {
       return (
+        this.$store.state.user &&
         this.$store.state.user.user_id !== undefined &&
         this.$store.state.user.user_id !== null
       )

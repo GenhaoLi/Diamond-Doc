@@ -3,22 +3,6 @@
     <el-container>
       <el-header height="50px">
         <div>协作文档</div>
-        <div class="right-end">
-          <div class="header-buttons" v-if="selectedFiles.length !== 0">
-            <el-button
-              type="danger"
-              size="small"
-              plain
-              @click="deleteSelectedFiles"
-              >删除
-            </el-button>
-            <el-divider direction="vertical"></el-divider>
-          </div>
-          <!--          select all-->
-          <el-checkbox v-model="isAllSelected" @change="handleSelectAll">
-            全选
-          </el-checkbox>
-        </div>
       </el-header>
       <el-main class="file-icons">
         <el-card
@@ -36,7 +20,11 @@
           </div>
           <div class="upper-right">
             <el-popover placement="right" width="100" trigger="click">
-              <i class="el-icon-more clickable" slot="reference"></i>
+              <i
+                class="el-icon-more clickable"
+                slot="reference"
+                @click="setCurrentDoc(file)"
+              ></i>
               <div class="card-menu">
                 <el-button type="text" @click="goToEdit(file.document_id)">
                   编辑
@@ -47,12 +35,15 @@
                 <el-button type="text" @click="shareFile(file.document_id)">
                   邀请协作
                 </el-button>
-                <el-button type="text" @click="renameFile(file.document_id)">
-                  重命名
+                <el-button type="text" @click="showTeamInfoDialog = true">
+                  协作信息
                 </el-button>
-                <el-button type="text" @click="deleteFile(file.document_id)">
-                  删除
-                </el-button>
+                <!--                <el-button type="text" @click="renameFile(file.document_id)">-->
+                <!--                  重命名-->
+                <!--                </el-button>-->
+                <!--                <el-button type="text" @click="deleteFile(file.document_id)">-->
+                <!--                  删除-->
+                <!--                </el-button>-->
               </div>
             </el-popover>
           </div>
@@ -76,6 +67,44 @@
         </el-card>
       </el-main>
     </el-container>
+    <el-dialog
+      title="协作信息"
+      :visible.sync="showTeamInfoDialog"
+      v-if="showTeamInfoDialog"
+      width="50%"
+      append-to-body
+    >
+      <el-table
+        :data="[{ user_id: '123', username: 'lgh', authority: 1 }]"
+        style="width: 100%"
+        stripe
+        border
+        height="200"
+      >
+        <el-table-column label="用户名" prop="username"></el-table-column>
+        <el-table-column label="角色"> 创建者</el-table-column>
+        <el-table-column label="权限"> 编辑 </el-table-column>
+        <el-table-column label="操作" fixed="right" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              @click="
+                changeAuthority(scope.row.user_id, 1 - scope.row.authority)
+              "
+            >
+              {{ scope.row.authority === 1 ? "取消编辑权限" : "设置编辑权限" }}
+            </el-button>
+            <el-button
+              type="text"
+              @click="deleteMember(scope.row.user_id)"
+              style="margin-left: 10px"
+            >
+              移出团队
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
     <Invite :doc_id="toBeShared" ref="invite"></Invite>
   </div>
 </template>
@@ -92,6 +121,16 @@ export default {
       files: [],
       isAllSelected: false,
       toBeShared: null,
+      showTeamInfoDialog: false,
+      currentDoc: {
+        members: [
+          {
+            user_id: "123",
+            username: "lgh",
+            authority: 1,
+          },
+        ],
+      },
     }
   },
   computed: {
@@ -102,10 +141,13 @@ export default {
       return this.$store.state.user
     },
   },
-  mounted () {
+  mounted() {
     this.getFiles()
   },
   methods: {
+    setCurrentDoc(file) {
+      this.currentDoc = file
+    },
     getFiles() {
       this.$http
         .get("/doc/getCollaborativeDocument", {
@@ -125,13 +167,27 @@ export default {
           this.$message.error("获取文档失败")
         })
     },
+    favFile(doc_id) {
+      this.$http
+        .post("/collection/new", {
+          user_id: this.userInfo.user_id,
+          document_id: doc_id,
+        })
+        .then((response) => {
+          console.log(response)
+          if (!response.data.success) {
+            this.$message.error("收藏文档失败")
+            return
+          }
+          this.$message.success("收藏文档成功")
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$message.error("收藏文档失败")
+        })
+    },
     goToEdit(doc_id) {
-      this.$router.push({
-        name: "Edit",
-        params: {
-          doc_id,
-        },
-      })
+      this.$router.push("/edit/" + doc_id)
     },
     shareFile(document_id) {
       this.toBeShared = document_id

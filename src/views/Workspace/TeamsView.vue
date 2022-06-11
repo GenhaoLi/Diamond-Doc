@@ -3,8 +3,39 @@
     <el-container>
       <el-header height="50px">
         <div v-if="currentTeam === null">团队空间</div>
-        <div v-else>
-          {{ currentTeam.name }}
+        <div v-else class="left-end">
+          <div style="line-height: 100%">{{ currentTeam.name }}</div>
+          <el-divider direction="vertical"></el-divider>
+          <el-button
+            type="text"
+            @click="checkTeamInfo"
+            style="float: right; margin-right: 10px"
+          >
+            团队信息
+          </el-button>
+          <el-button
+            type="text"
+            @click="inviteMember(currentTeam.team_id)"
+            style="float: right; margin-right: 10px"
+          >
+            邀请成员
+          </el-button>
+<!--          <el-button-->
+<!--            type="text"-->
+<!--            @click="leaveTeam"-->
+<!--            style="float: right; margin-right: 10px"-->
+<!--            v-if="currentTeam.creator_id === userInfo.user_id"-->
+<!--          >-->
+<!--            解散团队-->
+<!--          </el-button>-->
+          <el-button
+            type="text"
+            @click="leaveTeam"
+            style="float: right; margin-right: 10px"
+            v-else
+          >
+            退出团队
+          </el-button>
         </div>
         <div class="right-end">
           <el-button
@@ -37,7 +68,7 @@
           >
             <div class="upper-right">
               <el-popover placement="right" width="100" trigger="click">
-                <i class="el-icon-more clickable" slot="reference"></i>
+                <!--                <i class="el-icon-more clickable" slot="reference"></i>-->
                 <div class="card-menu">
                   <el-button type="text" @click="inviteMember(team.team_id)">
                     邀请成员
@@ -60,7 +91,6 @@
               </div>
               <div>
                 <div class="team-name">{{ team.name }}</div>
-                <!--          TODO: when title too long -->
               </div>
             </div>
           </el-card>
@@ -82,12 +112,12 @@
                   >
                     删除
                   </el-button>
-                  <el-button
-                    type="text"
-                    @click="renameFolder(folder.folder_id)"
-                  >
-                    重命名
-                  </el-button>
+                  <!--                  <el-button-->
+                  <!--                    type="text"-->
+                  <!--                    @click="renameFolder(folder.folder_id)"-->
+                  <!--                  >-->
+                  <!--                    重命名-->
+                  <!--                  </el-button>-->
                 </div>
               </el-popover>
             </div>
@@ -126,9 +156,9 @@
                   <el-button type="text" @click="deleteFile(file.document_id)">
                     删除
                   </el-button>
-                  <el-button type="text" @click="renameFile(file.document_id)">
-                    重命名
-                  </el-button>
+                  <!--                  <el-button type="text" @click="renameFile(file.document_id)">-->
+                  <!--                    重命名-->
+                  <!--                  </el-button>-->
                 </div>
               </el-popover>
             </div>
@@ -147,6 +177,7 @@
         </div>
       </el-main>
     </el-container>
+    <!--    new team-->
     <el-dialog
       title="创建团队"
       :visible.sync="showCreateTeamDialog"
@@ -167,9 +198,77 @@
           ></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <div>
         <el-button @click="showCreateTeamDialog = false">取 消</el-button>
         <el-button type="primary" @click="createTeam">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!--    team info-->
+    <el-dialog
+      title="团队信息"
+      :visible.sync="showTeamInfoDialog"
+      v-if="showTeamInfoDialog"
+      width="50%"
+      append-to-body
+    >
+      <el-form :model="currentTeam">
+        <el-form-item label="团队名称">
+          <el-input
+            v-model="currentTeam.name"
+            placeholder="请输入团队名称"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="团队描述">
+          <el-input
+            v-model="currentTeam.team_introduction"
+            placeholder="请输入团队描述"
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <el-table
+        :data="currentTeam.members"
+        style="width: 100%"
+        stripe
+        border
+        height="200"
+      >
+        <el-table-column label="用户名" prop="username"></el-table-column>
+        <el-table-column label="角色">
+          <template slot-scope="scope">
+            {{
+              scope.row.user_id === currentTeam.creator_id ? "管理员" : "成员"
+            }}
+          </template>
+        </el-table-column>
+        <el-table-column label="权限">
+          <template slot-scope="scope">
+            {{ scope.row.authority === 1 ? "编辑" : "只读" }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" fixed="right" align="center">
+          <template slot-scope="scope">
+            <el-button
+              type="text"
+              @click="
+                changeAuthority(scope.row.user_id, 1 - scope.row.authority)
+              "
+            >
+              {{ scope.row.authority === 1 ? "取消编辑权限" : "设置编辑权限" }}
+            </el-button>
+            <el-button
+              type="text"
+              @click="changeAuthority(scope.row.user_id, 2)"
+              style="margin-left: 10px"
+              v-if="scope.user_id !== currentTeam.creator_id"
+            >
+              移出团队
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="showTeamInfoDialog = false">取 消</el-button>
+        <el-button type="primary" @click="updateTeamInfo">确 定</el-button>
       </div>
     </el-dialog>
     <Invite :team_id="teamToBeInvitedTo" ref="invite"></Invite>
@@ -177,7 +276,7 @@
 </template>
 
 <script>
-import Invite from '@/components/Invite'
+import Invite from "@/components/Invite"
 export default {
   name: "TeamsView",
   components: { Invite },
@@ -187,6 +286,7 @@ export default {
       currentTeam: null,
       currentFolder: null,
       showCreateTeamDialog: false,
+      showTeamInfoDialog: false,
       newTeam: {
         name: "",
         introduction: "",
@@ -216,6 +316,65 @@ export default {
     },
   },
   methods: {
+    changeAuthority(user_id, authority) {
+      this.$http
+        .post("/team/changeAuthority", {
+          modifier_id: this.$store.state.user.user_id,
+          user_id: user_id,
+          team_id: this.currentTeam.team_id,
+          authority: authority,
+        })
+        .then(() => {
+          this.checkTeamInfo()
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$message.error("更改权限失败")
+        })
+    },
+    leaveTeam() {
+      this.$http
+        .post("/team/leaveTeam", {
+          team_id: this.currentTeam.team_id,
+          user_id: this.userInfo.user_id,
+        })
+        .then((res) => {
+          if (res.data.code !== 200) {
+            this.$message.error(res.data.message)
+            return
+          }
+          this.$message.success("退出团队成功")
+          this.getTeams()
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$message.error("退出团队失败")
+        })
+    },
+    checkTeamInfo() {
+      this.$http
+        .post("/team/view", {
+          team_id: this.currentTeam.team_id,
+        })
+        .then(
+          (res) => {
+            if (!res.data.success) {
+              this.$message.error(res.data.message)
+            }
+            this.currentTeam = Object.assign(
+              {},
+              res.data.team,
+              this.currentTeam,
+            )
+            this.currentTeam.members = res.data.teammateList
+            this.showTeamInfoDialog = true
+          },
+          (err) => {
+            console.log(err)
+            this.$message.error("获取团队信息失败")
+          },
+        )
+    },
     inviteMember(team_id) {
       this.teamToBeInvitedTo = team_id
       this.$refs.invite.show()
@@ -226,10 +385,10 @@ export default {
           team_id: this.currentTeam.team_id,
           user_id: this.$store.state.user.user_id,
           folder_id: this.currentFolder.folder_id,
-          title: "新建文档",
+          title: "新建文档" + (Math.random()*10).toFixed(0),
         })
         .then((res) => {
-          if (res.data.status !== 200) {
+          if (res.data.code !== 200) {
             this.$message.error(res.data.message)
             return
           }
@@ -254,7 +413,7 @@ export default {
           }
           this.docs = res.data.documentList
           this.folders = res.data.folderList
-          this.$message.success("成功获取文件和文件夹")
+          // this.$message.success("成功获取文件和文件夹")
         })
         .catch((err) => {
           console.log(err)
@@ -339,6 +498,16 @@ export default {
 </script>
 
 <style scoped>
+.left-end {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-end .el-button {
+  font-size: medium;
+}
+
 .el-icon-folder {
   font-size: 60px;
 }

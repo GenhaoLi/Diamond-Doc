@@ -18,6 +18,9 @@
         <el-form-item label="邮箱">
           <el-input v-model="userInfo.email"></el-input>
         </el-form-item>
+        <el-form-item label="个人简介">
+          <el-input v-model="newIntro"></el-input>
+        </el-form-item>
 <!--        TODO 其他信息-->
 <!--        TODO 上传、修改头像-->
       </el-form>
@@ -38,6 +41,7 @@ export default {
   data: function () {
     return {
       userInfoVisible: false,
+      newIntro: "",
     }
   },
   methods: {
@@ -46,7 +50,13 @@ export default {
     },
     updateInfo() {
       // TODO 按照接口的参数来
-      this.$http.post("/user/updateInfo", this.userInfo).then(res => {
+      let newInfo = JSON.parse(JSON.stringify(this.userInfo))
+      newInfo.user_info = this.newIntro
+      this.$http.post("/user/updateInfo", {
+        user_info: newInfo.user_info,
+        sex:0,
+        birthday:null
+      }).then(res => {
         console.log(res)
         if (res.data.code !== 200) {
           this.$message({
@@ -55,7 +65,8 @@ export default {
           })
           return
         }
-        this.$store.commit("setUser", this.userInfo)
+
+        this.$store.commit("setUser", newInfo)
         this.$message({
           message: "修改成功",
           type: "success"

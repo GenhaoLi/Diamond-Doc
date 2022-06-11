@@ -3,22 +3,23 @@
     <span class="left-end"
       ><a class="clickable" @click="$router.push('/')">金刚石文档</a></span
     >
-    <span class="search-bar">
-      <el-input
-        v-model="searchInput"
-        class="search-input"
-        placeholder="搜索文件"
-        size="small"
-        @change="searchFile"
-        @keyup.enter.native="searchFile"
-      >
-        <i
-          slot="suffix"
-          class="el-input__icon el-icon-search clickable"
-          @click="searchFile"
-        ></i>
-      </el-input>
-    </span>
+<!--    <span class="search-bar">-->
+<!--    TODO search files-->
+<!--      <el-input-->
+<!--        v-model="searchInput"-->
+<!--        class="search-input"-->
+<!--        placeholder="搜索文件"-->
+<!--        size="small"-->
+<!--        @change="searchFile"-->
+<!--        @keyup.enter.native="searchFile"-->
+<!--      >-->
+<!--        <i-->
+<!--          slot="suffix"-->
+<!--          class="el-input__icon el-icon-search clickable"-->
+<!--          @click="searchFile"-->
+<!--        ></i>-->
+<!--      </el-input>-->
+<!--    </span>-->
     <span class="right-end">
       <span>
         <NotificationIcon></NotificationIcon>

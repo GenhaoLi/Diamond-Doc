@@ -18,15 +18,16 @@
                 <el-button type="text" @click="goToEdit(file.document_id)">
                   编辑
                 </el-button>
-                <el-button type="text" @click="deleteFile(file.document_id)">
+                <el-button type="text" @click="deleteFile(file.document_id)" v-if="file.type === 0">
                   删除
                 </el-button>
-                <el-button type="text" @click="shareFile(file.document_id)">
+                <el-button type="text" @click="shareFile(file.document_id)" v-if="file.type !== 2">
                   邀请协作
                 </el-button>
-                <el-button type="text" @click="renameFile(file.document_id)">
-                  重命名
-                </el-button>
+<!--                <el-button type="text" @click="renameFile(file.document_id)">-->
+<!--                  重命名-->
+<!--                TODO rename file-->
+<!--                </el-button>-->
               </div>
             </el-popover>
           </div>
@@ -84,6 +85,29 @@ export default {
     }
   },
   methods: {
+    deleteFile(document_id) {
+      this.$http
+        .post("/doc/remove", {
+          document_id: document_id,
+        })
+        .then((response) => {
+          console.log(response)
+          if (!response.data.success) {
+            this.$message.error(response.data.message)
+            return
+          }
+          this.$message.success("删除文档成功")
+          this.getRecentFiles()
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$message.error("删除文档失败")
+        })
+    },
+    shareFile(document_id) {
+      this.toBeShared = document_id
+      this.$refs.invite.show()
+    },
     getPermission(authority) {
       return authority === 1 ? "可编辑" : "只读"
     },

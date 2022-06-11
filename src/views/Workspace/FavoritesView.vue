@@ -47,12 +47,12 @@
                 <el-button type="text" @click="shareFile(file.document_id)">
                   邀请协作
                 </el-button>
-                <el-button type="text" @click="renameFile(file.document_id)">
-                  重命名
-                </el-button>
-                <el-button type="text" @click="deleteFile(file.document_id)">
-                  删除
-                </el-button>
+<!--                <el-button type="text" @click="renameFile(file.document_id)">-->
+<!--                  重命名-->
+<!--                </el-button>-->
+<!--                <el-button type="text" @click="deleteFile(file.document_id)">-->
+<!--                  删除-->
+<!--                </el-button>-->
               </div>
             </el-popover>
           </div>
@@ -96,6 +96,11 @@ export default {
     this.getFavorites()
   },
   methods: {
+    unFavSelectedFiles() {
+      this.selectedFiles.forEach((file) => {
+        this.unFavFile(file.document_id)
+      })
+    },
     unFavFile(doc_id) {
       this.$http.post('/collection/delete',{
         document_id: doc_id,

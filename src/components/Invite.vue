@@ -76,7 +76,7 @@ export default {
             return
           }
           this.inviteCode = res.data
-          this.inviteLink = "http://49.233.54.160/invited/" + this.inviteCode
+          this.inviteLink = "http://49.233.54.160:8080/invited/" + this.inviteCode
           this.$message({
             message: "生成邀请链接成功",
             type: "success",
