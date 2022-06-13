@@ -32,7 +32,6 @@
             type="text"
             @click="leaveTeam"
             style="float: right; margin-right: 10px"
-            v-else
           >
             退出团队
           </el-button>
